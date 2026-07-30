@@ -253,17 +253,13 @@
         }
 
         // Helper: Image URL Processor (Google Drive support)
-        function getImageUrl(url) {
-            if (!url) return "https://placehold.co/800x1000/f8fafc/1e293b?text=VI+PRINTING";
-            url = url.trim();
-            if (url.includes('drive.google.com')) {
-                let id = "";
-                if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0];
-                else if (url.includes('id=')) id = url.split('id=')[1].split('&')[0];
-                return id ? `https://lh3.googleusercontent.com/u/0/d/${id}` : url;
-            }
-            return url;
-        }
+    function getImageUrl(url) {
+    // Jika URL kosong di database, tampilkan gambar placeholder
+    if (!url) return "https://placehold.co/800x1000/f8fafc/1e293b?text=VI+PRINTING";
+    
+    // Langsung kembalikan URL aslinya dari Supabase
+    return url.trim();
+}
 
         // UI: Update Filter Indicator
         function updateIndicator(el) {
