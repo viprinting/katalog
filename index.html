@@ -349,32 +349,44 @@ function preloadImages(products) {
         }
 
         function renderGrid(data) {
-            const grid = document.getElementById('katalog-grid');
-            if (data.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center py-20 text-slate-400 italic">Tidak ada produk ditemukan.</p>`;
-                return;
-            }
+    const grid = document.getElementById('katalog-grid');
+    if (data.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center py-20 text-slate-400 italic">Tidak ada produk ditemukan.</p>`;
+        return;
+    }
 
-            grid.innerHTML = data.map((item, index) => {
-                const daftarGambar = item.gambar.split(',').map(s => s.trim());
-                const isPromo = item.is_promo || item.kategori.toLowerCase().includes('promo');
-                const displayPrice = isPromo && item.harga_promo ? item.harga_promo : item.harga;
-                
-                return `
-                    <div class="product-card">
-                        <div class="image-container cursor-pointer group" onclick="bukaModalById('${item.id}')">
-                            ${isPromo ? '<div class="absolute top-3 right-3 z-10 text-[7px] font-bold px-3 py-1 promo-tag uppercase tracking-[0.1em] rounded-sm">PROMO</div>' : ''}
-                            <img src="${getImageUrl(daftarGambar[0])}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="mt-5 text-center px-1">
-                            <span class="text-[8px] font-bold text-amber-600 uppercase tracking-[0.25em] mb-1.5 block">${item.kategori}</span>
-                            <h3 class="font-bold text-slate-900 text-[11px] uppercase tracking-wider mb-1 truncate">${item.nama}</h3>
-                            <div class="text-[10px] font-light text-slate-400 italic">${formatIDR(displayPrice)}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+    grid.innerHTML = data.map((item, index) => {
+        const daftarGambar = item.gambar.split(',').map(s => s.trim());
+        const isPromo = item.is_promo || item.kategori.toLowerCase().includes('promo');
+        
+        // Logika Tampilan Harga: Jika promo tampilkan harga coret dan harga promo berdampingan
+        let priceHTML = '';
+        if (isPromo && item.harga_promo) {
+            priceHTML = `
+                <div class="flex items-center justify-center gap-1.5">
+                    <span class="text-[9px] line-through text-slate-400/70">${formatIDR(item.harga)}</span>
+                    <span class="text-[10px] font-bold text-amber-600 italic">${formatIDR(item.harga_promo)}</span>
+                </div>
+            `;
+        } else {
+            priceHTML = `<div class="text-[10px] font-light text-slate-400 italic">${formatIDR(item.harga)}</div>`;
         }
+        
+        return `
+            <div class="product-card">
+                <div class="image-container cursor-pointer group" onclick="bukaModalById('${item.id}')">
+                    ${isPromo ? '<div class="absolute top-3 right-3 z-10 text-[7px] font-bold px-3 py-1 promo-tag uppercase tracking-[0.1em] rounded-sm">PROMO</div>' : ''}
+                    <img src="${getImageUrl(daftarGambar[0])}" class="w-full h-full object-cover">
+                </div>
+                <div class="mt-5 text-center px-1">
+                    <span class="text-[8px] font-bold text-amber-600 uppercase tracking-[0.25em] mb-1.5 block">${item.kategori}</span>
+                    <h3 class="font-bold text-slate-900 text-[11px] uppercase tracking-wider mb-1 truncate">${item.nama}</h3>
+                    ${priceHTML}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
         function filterData(kat, el) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
