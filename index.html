@@ -246,6 +246,22 @@
         let listProduk = [];
         let currentProductGallery = [];
 
+        // Helper: Preload Images untuk mencegah kedipan
+function preloadImages(products) {
+    const promises = products.map(item => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            const daftarGambar = item.gambar.split(',').map(s => s.trim());
+            img.src = getImageUrl(daftarGambar[0]);
+            
+            // Resolve baik saat sukses maupun error agar loading tidak terhenti (stuck)
+            img.onload = resolve;
+            img.onerror = resolve;
+        });
+    });
+    return Promise.all(promises);
+}
+
         // Helper: Format Rupiah
         function formatIDR(val) {
             if (!val || isNaN(val)) return "Hubungi Admin";
@@ -299,6 +315,19 @@
                     kategori: item.kategori || "Umum"
                 }));
 
+                // --- TAMBAHAN KODE PRELOAD MULAI DI SINI ---
+                // Ubah teks loader untuk memberi tahu user bahwa sistem sedang memuat gambar
+                grid.innerHTML = `
+                    <div class="col-span-full py-32 flex flex-col items-center">
+                        <div class="w-6 h-6 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="mt-4 text-[9px] tracking-[0.4em] uppercase font-bold text-slate-400">Memuat Gambar...</p>
+                    </div>
+                `;
+                
+                // Tunggu semua gambar sampul (thumbnail) diunduh
+                await preloadImages(listProduk);
+                // --- TAMBAHAN KODE PRELOAD SELESAI ---
+
                 renderGrid(listProduk);
                 setTimeout(() => updateIndicator(document.querySelector('.filter-btn.active')), 300);
 
@@ -332,7 +361,7 @@
                     <div class="product-card fade-in-up" style="animation-delay: ${index * 0.05}s">
                         <div class="image-container cursor-pointer group" onclick="bukaModalById('${item.id}')">
                             ${isPromo ? '<div class="absolute top-3 right-3 z-10 text-[7px] font-bold px-3 py-1 promo-tag uppercase tracking-[0.1em] rounded-sm">PROMO</div>' : ''}
-                            <img src="${getImageUrl(daftarGambar[0])}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="${getImageUrl(daftarGambar[0])}" class="w-full h-full object-cover">
                         </div>
                         <div class="mt-5 text-center px-1">
                             <span class="text-[8px] font-bold text-amber-600 uppercase tracking-[0.25em] mb-1.5 block">${item.kategori}</span>
