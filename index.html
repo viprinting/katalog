@@ -459,11 +459,15 @@ function preloadImages(products) {
 
             document.getElementById('modal-detail').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            window.location.hash = "detail";
         }
 
         function tutupModal() {
             document.getElementById('modal-detail').classList.add('hidden');
             document.body.style.overflow = 'auto';
+         if (window.location.hash === "#detail") {
+                history.back();
+            }
         }
 
         // --- Fullscreen Viewer Logic ---
@@ -524,6 +528,7 @@ function preloadImages(products) {
             carousel.innerHTML = ''; 
             dotsContainer.innerHTML = '';
             viewer.classList.remove('hidden');
+            window.location.hash = "zoom";
 
             let selectedIdx = 0;
 
@@ -572,7 +577,10 @@ function preloadImages(products) {
         }
 
         function tutupFullscreen() { 
-            document.getElementById('fullscreen-viewer').classList.add('hidden'); 
+            document.getElementById('fullscreen-viewer').classList.add('hidden');
+            if (window.location.hash === "#zoom") {
+                history.back();
+            }
         }
 
         window.onload = loadData;
