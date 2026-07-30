@@ -582,6 +582,30 @@ function preloadImages(products) {
                 history.back();
             }
         }
+        // --- SISTEM NAVIGASI TOMBOL BACK HANDPHONE ---
+        
+        // Bersihkan sisa hash di URL saat halaman pertama kali di-refresh/dibuka
+        if (window.location.hash) {
+            history.replaceState(null, null, ' ');
+        }
+
+        // Pantau saat tombol back ditekan
+        window.addEventListener('popstate', function () {
+            const hash = window.location.hash;
+            
+            if (hash === "#detail") {
+                // Jika URL adalah #detail (berarti user menekan back dari fullscreen)
+                // Tutup fullscreen saja, biarkan modal produk tetap terbuka
+                document.getElementById('fullscreen-viewer').classList.add('hidden');
+            } else if (hash === "" || hash === "#") {
+                // Jika URL kembali kosong (berarti user menekan back dari modal produk)
+                // Tutup semua pop-up dan kembalikan scroll website
+                document.getElementById('fullscreen-viewer').classList.add('hidden');
+                document.getElementById('modal-detail').classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        // ----------------------------------------------
 
         window.onload = loadData;
         window.onresize = () => updateIndicator(document.querySelector('.filter-btn.active'));
