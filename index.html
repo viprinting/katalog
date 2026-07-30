@@ -459,7 +459,7 @@ function preloadImages(products) {
 
             document.getElementById('modal-detail').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            window.location.hash = "detail";
+            history.pushState({ modal: true }, "", "");
         }
 
         function tutupModal() {
@@ -528,8 +528,7 @@ function preloadImages(products) {
             carousel.innerHTML = ''; 
             dotsContainer.innerHTML = '';
             viewer.classList.remove('hidden');
-            window.location.hash = "zoom";
-
+            
             let selectedIdx = 0;
 
             currentProductGallery.forEach((img, idx) => {
@@ -574,6 +573,7 @@ function preloadImages(products) {
                     }
                 });
             };
+            history.pushState({ zoom: true }, "", "");
         }
 
         function tutupFullscreen() { 
@@ -590,20 +590,28 @@ function preloadImages(products) {
         }
 
         // Pantau saat tombol back ditekan
-        window.addEventListener('popstate', function () {
-            const hash = window.location.hash;
+        window.addEventListener('popstate', function (event) {
+            const modalDetail = document.getElementById('modal-detail');
+            const fullscreenViewer = document.getElementById('fullscreen-viewer');
             
-            if (hash === "#detail") {
-                // Jika URL adalah #detail (berarti user menekan back dari fullscreen)
-                // Tutup fullscreen saja, biarkan modal produk tetap terbuka
-                document.getElementById('fullscreen-viewer').classList.add('hidden');
-            } else if (hash === "" || hash === "#") {
-                // Jika URL kembali kosong (berarti user menekan back dari modal produk)
-                // Tutup semua pop-up dan kembalikan scroll website
-                document.getElementById('fullscreen-viewer').classList.add('hidden');
-                document.getElementById('modal-detail').classList.add('hidden');
-                document.body.style.overflow = 'auto';
+            // Cek apakah fullscreen sedang terbuka
+            if (!fullscreenViewer.classList.contains('hidden')) {
+                // Jika ya, tutup fullscreen dulu
+                fullscreenViewer.classList.add('hidden');
+                return;
             }
+            
+            // Cek apakah modal detail produk sedang terbuka
+            if (!modalDetail.classList.contains('hidden')) {
+                // Jika ya, tutup modal detail produk dan aktifkan kembali scroll halaman utama
+                modalDetail.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                return;
+            }
+            
+            // Jika tidak ada modal atau fullscreen yang terbuka, 
+            // biarkan browser melakukan aksi defaultnya (mundur ke halaman sebelumnya / keluar)
+            history.back();
         });
         // ----------------------------------------------
 
